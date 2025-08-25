@@ -12,9 +12,13 @@ const sequelize = new Sequelize({
   }
 });
 
-// Import models
-const User = require('./User');
-const Link = require('./Link');
+// Import model functions
+const UserModel = require('./User');
+const LinkModel = require('./Link');
+
+// Create model instances with sequelize
+const User = UserModel(sequelize);
+const Link = LinkModel(sequelize);
 
 // Define associations/relationships
 User.hasMany(Link, {

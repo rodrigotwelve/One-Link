@@ -19,15 +19,34 @@ app.use(express.urlencoded({ extended: true }));
 
 // Root endpoint
 app.get('/', (req, res) => {
-  res.json({ message: 'One-Link Backend is running' });
+  res.json({ 
+    message: 'One-Link Backend is running',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      links: '/api/links',
+      docs: 'Check README.md for API documentation'
+    }
+  });
 });
 
 // API Routes
 // Authentication routes (no auth required)
 app.use('/api/auth', authRoutes);
 
-// Link management routes - require authentication
+// Protected routes - require authentication
+// Link management routes
 app.use('/api/links', authenticateToken, linkRoutes);
+
+// Protected user profile route
+app.get('/api/auth/me', authenticateToken, (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      user: req.user.getPublicProfile()
+    }
+  });
+});
 
 // Test database connection and start server
 async function startServer() {
@@ -46,6 +65,7 @@ async function startServer() {
       console.log(`📱 Backend API available at http://localhost:${PORT}`);
       console.log(`🔐 Auth API available at http://localhost:${PORT}/api/auth`);
       console.log(`🔗 Link API available at http://localhost:${PORT}/api/links`);
+      console.log(`👤 User Profile: http://localhost:${PORT}/api/auth/me (protected)`);
     });
   } catch (error) {
     console.error('❌ Unable to connect to the database or start server:', error);
